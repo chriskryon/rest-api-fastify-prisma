@@ -1,8 +1,22 @@
-import fastify from "fastify";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.route";
 import { userSchemas } from "./modules/user/user.schema";
+import fjwt from "fastify-jwt";
 
 const server = fastify();
+
+server.register(fjwt, {
+    secret: 'supersecret'
+    }
+);
+
+server.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
+    try {
+        await request.jwtVerify();
+    } catch (err) {
+        return reply.code(401).send({ message: 'Unauthorized' });
+    }
+})
 
 async function main() {
     for (const schema of userSchemas) {
