@@ -1,11 +1,12 @@
 import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.route";
 import { userSchemas } from "./modules/user/user.schema";
-import fjwt from "fastify-jwt";
+// import fjwp from 'fastify-jwt';
+import fjwp from '@fastify/jwt'
 
 const server = fastify();
 
-server.register(fjwt, {
+server.register(fjwp, {
     secret: 'supersecret'
     }
 );
