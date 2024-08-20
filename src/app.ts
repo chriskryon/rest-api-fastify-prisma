@@ -1,10 +1,16 @@
 import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.route";
 import { userSchemas } from "./modules/user/user.schema";
-// import fjwp from 'fastify-jwt';
+import { productSchemas } from "./modules/product/product.route";
 import fjwp from '@fastify/jwt'
 
 const server = fastify();
+
+declare module "fastify" {
+    export interface FastifyInstance {
+        authenticate: any;
+    }
+}
 
 server.register(fjwp, {
     secret: 'supersecret'
@@ -20,7 +26,7 @@ server.decorate('authenticate', async function (request: FastifyRequest, reply: 
 })
 
 async function main() {
-    for (const schema of userSchemas) {
+    for (const schema of [...userSchemas, ...productSchemas]) {
         server.addSchema(schema);
     }
     
