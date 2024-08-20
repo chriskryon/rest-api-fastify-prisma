@@ -19,3 +19,17 @@ export async function findUserByEmail(input: string) {
         where: {email: input}
     })
 }
+
+export async function findUsers() {
+    const users = prisma.user.findMany(
+        {
+            select: {
+                email: true,
+                name: true,
+                id: true,
+            }
+        }
+    ); 
+
+    return users;
+}
