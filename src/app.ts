@@ -1,8 +1,9 @@
 import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.route";
 import { userSchemas } from "./modules/user/user.schema";
-import { productSchemas } from "./modules/product/product.route";
 import fjwp from '@fastify/jwt'
+import { productSchemas } from "./modules/product/product.schema";
+import ProductRoutes from "./modules/product/product.route";
 
 const server = fastify();
 
@@ -11,6 +12,17 @@ declare module "fastify" {
         authenticate: any;
     }
 }
+
+declare module "@fastify/jwt" {
+    interface FastifyJWT {
+        user: {
+            id: number,
+            email: string,
+            name: string,
+        }
+    }
+}
+
 
 server.register(fjwp, {
     secret: 'supersecret'
@@ -31,6 +43,7 @@ async function main() {
     }
     
     server.register(userRoutes, {prefix: 'api/users'})
+    server.register(ProductRoutes, {prefix: 'api/products'})
      
     server.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
         if (err) throw err

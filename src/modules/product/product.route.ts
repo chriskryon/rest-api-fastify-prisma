@@ -1,37 +1,34 @@
-import { z } from 'zod'
-import {buildJsonSchemas} from 'fastify-zod'
+import { FastifyInstance } from "fastify";
+import { createProductHandler, getProductsHandler } from "./product.controller";
+import { $ref } from "../user/user.schema";
 
-const productInput = {
-    title: z.string(),
-    price: z.string(),
-    content: z.string().optional(),
+async function ProductRoutes(server: FastifyInstance) {
+  server.post(
+    "/",
+    {
+      preHandler: [server.authenticate],
+      schema: {
+        body: { $ref: "createProductSchema" },
+        response: {
+          201: { $ref: "productResponseSchema" },
+        },
+      },
+    },
+    createProductHandler
+  );
+
+  server.get(
+    "/",
+    {
+      schema: {
+        response: {
+          200: { $ref: "productsResponseSchema" },
+        },
+      },
+    },
+
+    getProductsHandler
+  );
 }
 
-const productGenerated = {
-    id: z.number(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-}
-
-const createProductSchema = z.object({
-    ...productInput,
-})
-
-const productResponseSchema = z.object({
-    ...productInput,
-    ...productGenerated
-})
-
-const productSchema = z.object({})
-
-const productsResponseSchema = z.array(productResponseSchema)
-
-export type CreateUserInput = z.infer<typeof createProductSchema>;
-
-export const {schemas: productSchemas, $ref} = buildJsonSchemas({
-    createProductSchema,
-    productResponseSchema,
-    productsResponseSchema,
-})
-
-
+export default ProductRoutes;
